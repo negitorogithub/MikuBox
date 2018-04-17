@@ -13,6 +13,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        //AWS用
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -30,4 +33,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.amazonaws:aws-android-sdk-auth-core:2.6.18'
+    implementation 'com.amazonaws:aws-android-sdk-pinpoint:2.6.18'
 }

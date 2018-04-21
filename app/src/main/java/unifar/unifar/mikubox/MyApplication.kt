@@ -3,6 +3,9 @@ package unifar.unifar.mikubox
 import com.amazonaws.mobile.config.AWSConfiguration
 import com.amazonaws.mobile.auth.core.IdentityManager
 import android.support.multidex.MultiDexApplication
+import com.amazonaws.auth.AWSCredentialsProvider
+
+
 
 
 /**
@@ -18,13 +21,21 @@ public class MyApplication : MultiDexApplication() {
 
     private fun initializeApplication() {
 
-        val awsConfiguration = AWSConfiguration(applicationContext)
+        val awsConfig = AWSConfiguration(applicationContext)
 
         // If IdentityManager is not created, create it
         if (IdentityManager.getDefaultIdentityManager() == null) {
+            val awsConfiguration = AWSConfiguration(applicationContext)
             val identityManager = IdentityManager(applicationContext, awsConfiguration)
             IdentityManager.setDefaultIdentityManager(identityManager)
         }
+
+        // Register identity providers here.
+        // With none registered IdentityManager gets unauthenticated AWS credentials
+
+
+        val credentialsProvider = IdentityManager.getDefaultIdentityManager().credentialsProvider
+
 
     }
 

@@ -36,4 +36,5 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.amazonaws:aws-android-sdk-auth-core:2.6.18'
     implementation 'com.amazonaws:aws-android-sdk-pinpoint:2.6.18'
+    implementation "com.amazonaws:aws-android-sdk-ddb-mapper:2.6.18"
 }

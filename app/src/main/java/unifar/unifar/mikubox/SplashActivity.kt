@@ -15,7 +15,7 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-
+        /*
         val appContext = applicationContext
         val awsConfig = AWSConfiguration(appContext)
         val identityManager = IdentityManager(appContext, awsConfig)
@@ -29,5 +29,6 @@ class SplashActivity : AppCompatActivity() {
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
         finish()
+        */
     }
 }

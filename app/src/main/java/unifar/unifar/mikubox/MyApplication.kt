@@ -16,13 +16,11 @@ public class MyApplication : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        initializeApplication()
+        //initializeApplication()
     }
 
     private fun initializeApplication() {
-
-        val awsConfig = AWSConfiguration(applicationContext)
-
+        /*
         // If IdentityManager is not created, create it
         if (IdentityManager.getDefaultIdentityManager() == null) {
             val awsConfiguration = AWSConfiguration(applicationContext)
@@ -35,7 +33,7 @@ public class MyApplication : MultiDexApplication() {
 
 
         val credentialsProvider = IdentityManager.getDefaultIdentityManager().credentialsProvider
-
+        */
 
     }
 

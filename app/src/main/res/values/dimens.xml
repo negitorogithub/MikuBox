@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="ItemSidePadding">16dp</dimen>
+    <dimen name="aboveZ">2dp</dimen>
+    <dimen name="Light_112">112sp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+    <dimen name="BigButtonHeight">200dp</dimen>
+
+    <dimen name="Regular_56">56sp</dimen>
+    <dimen name="Regular_45">45sp</dimen>
+    <dimen name="Regular_34">34sp</dimen>
+    <dimen name="Regular_24">24sp</dimen>
+    <dimen name="smallButtonHeight">64dp</dimen>
+    <dimen name="mediumButtonHeight">100dp</dimen>
+
+</resources>

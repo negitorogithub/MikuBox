@@ -4,8 +4,7 @@ import com.amazonaws.mobile.config.AWSConfiguration
 import com.amazonaws.mobile.auth.core.IdentityManager
 import android.support.multidex.MultiDexApplication
 import com.amazonaws.auth.AWSCredentialsProvider
-
-
+import com.google.android.gms.ads.MobileAds
 
 
 /**
@@ -16,24 +15,11 @@ public class MyApplication : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        //initializeApplication()
+        initializeApplication()
     }
 
     private fun initializeApplication() {
-        /*
-        // If IdentityManager is not created, create it
-        if (IdentityManager.getDefaultIdentityManager() == null) {
-            val awsConfiguration = AWSConfiguration(applicationContext)
-            val identityManager = IdentityManager(applicationContext, awsConfiguration)
-            IdentityManager.setDefaultIdentityManager(identityManager)
-        }
-
-        // Register identity providers here.
-        // With none registered IdentityManager gets unauthenticated AWS credentials
-
-
-        val credentialsProvider = IdentityManager.getDefaultIdentityManager().credentialsProvider
-        */
+        MobileAds.initialize(this, getString(R.string.ADMOB_APP_ID))
 
     }
 

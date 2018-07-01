@@ -13,6 +13,7 @@ import android.widget.Toast
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.lambdainvoker.LambdaInvokerFactory
 import com.amazonaws.regions.Regions
+import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
@@ -45,7 +46,13 @@ class MainActivity : AppCompatActivity() {
 
         initializeAWS()
         initializeAdMob()
-        val adRequest = AdRequest.Builder().build()
+        val extras = Bundle()
+
+        extras.putString("max_ad_content_rating", "PG")
+
+        val adRequest = AdRequest.Builder()
+                .addNetworkExtrasBundle(AdMobAdapter::class.java, extras)
+                .build()
         mAdView = findViewById(R.id.main_banner)
         mAdView.loadAd(adRequest)
 

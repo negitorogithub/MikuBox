@@ -7,12 +7,15 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.lambdainvoker.LambdaInvokerFactory
 import com.amazonaws.regions.Regions
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import unifar.unifar.mikubox.lambdaeventgenerator.NicoNicoInterface
 import unifar.unifar.mikubox.lambdaeventgenerator.YoutubeInterface
 import com.google.android.gms.ads.InterstitialAd
@@ -22,8 +25,11 @@ class MainActivity : AppCompatActivity() {
 
     private var nicoNicoUri: Uri? = null
     private var youTubeUri: Uri? = null
-
+    private lateinit var mAdView : AdView
     private lateinit var mInterstitialAd : InterstitialAd
+
+    private lateinit var niconicoButton: Button
+    private lateinit var youtubeButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,17 +37,28 @@ class MainActivity : AppCompatActivity() {
 
         initializeAWS()
         initializeAdMob()
+        val adRequest = AdRequest.Builder().build()
+        mAdView = findViewById(R.id.main_banner)
+        mAdView.loadAd(adRequest)
 
-        val niconicoTextView = findViewById<Button>(R.id.main_niconicoTextView)
-        val youtubeTextView = findViewById<Button>(R.id.main_youtubeTextView)
+
+        niconicoButton = findViewById<Button>(R.id.main_niconicoTextView)
+        youtubeButton = findViewById<Button>(R.id.main_youtubeTextView)
 
         val handlerThread = HandlerThread("networkThread").apply { start() }
 
-        niconicoTextView.setOnClickListener {
+        niconicoButton.setOnClickListener {
             nicoNicoUri?.let {
+                hideAllButtons()
+                Handler().postDelayed(
+                        {
+                            showAllButtons()
+                        }
+                        ,5000)
+
                 val i = Intent(Intent.ACTION_VIEW, nicoNicoUri)
                 showInterStitialAd()
-
+                Toast.makeText(this,resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
                 Handler(handlerThread.looper).postDelayed(
                         {
                             startActivity(i)
@@ -49,18 +66,27 @@ class MainActivity : AppCompatActivity() {
                             Log.d("miku", "niconicoReloaded")
                         }
                         ,5000)
+
             }
         }
 
-        youtubeTextView.setOnClickListener {
+        youtubeButton.setOnClickListener {
             youTubeUri?.let {
+                hideAllButtons()
+                Handler().postDelayed(
+                        {
+                            showAllButtons()
+                        }
+                        ,5000)
                 val i = Intent(Intent.ACTION_VIEW, youTubeUri)
                 showInterStitialAd()
+                Toast.makeText(this,resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
                 Handler(handlerThread.looper).postDelayed(
                         {
                             startActivity(i)
                             youTubeUri = Uri.parse(youtubeInterface?.GetRandomYoutubeLink()?.link)
                             Log.d("miku", "youtubeReloaded")
+                            showAllButtons()
                         }
                         , 5000)
             }
@@ -126,5 +152,14 @@ class MainActivity : AppCompatActivity() {
             youTubeUri = Uri.parse(youtubeInterface?.GetRandomYoutubeLink()?.link)
             Log.d("miku", "youtubeLoaded")
         }.start()
+    }
+    
+    private fun hideAllButtons(): Unit {
+        niconicoButton.visibility = View.INVISIBLE
+        youtubeButton.visibility = View.INVISIBLE
+    }
+    private fun showAllButtons(): Unit {
+        niconicoButton.visibility = View.VISIBLE
+        youtubeButton.visibility = View.VISIBLE
     }
 }

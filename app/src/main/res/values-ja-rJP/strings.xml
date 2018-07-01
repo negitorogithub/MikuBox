@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MikuBox</string>
     <string name="niconico">nico\nnico</string>
     <string name="youtube">Youtube</string>
-    <string name="wait5seconds">5 seconds to go.</string>
+    <string name="wait5seconds">残り5秒…</string>
 </resources>

@@ -19,6 +19,10 @@ import com.google.android.gms.ads.AdView
 import unifar.unifar.mikubox.lambdaeventgenerator.NicoNicoInterface
 import unifar.unifar.mikubox.lambdaeventgenerator.YoutubeInterface
 import com.google.android.gms.ads.InterstitialAd
+import hotchemi.android.rate.AppRate
+import hotchemi.android.rate.OnClickButtonListener
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +38,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        monitorAppRate()
+
+        AppRate.showRateDialogIfMeetsConditions(this)
+
 
         initializeAWS()
         initializeAdMob()
@@ -93,9 +101,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun monitorAppRate() {
+        AppRate.with(this)
+                .setInstallDays(0) // default 10, 0 means install day.
+                .setLaunchTimes(5) // default 10
+                .setRemindInterval(1) // default 1
+                .setShowLaterButton(true) // default true
+                .setDebug(false) // default false
+                .setOnClickButtonListener { which ->
+                    // callback listener.
+                    Log.d(MainActivity::class.java.name, Integer.toString(which))
+                }
+                .monitor()
+    }
+
     private fun initializeAdMob() {
         mInterstitialAd = InterstitialAd(this).apply {
-            adUnitId = resources.getString(R.string.INTERSTITIAL_AD_TEST_ID)
+            adUnitId = resources.getString(R.string.INTERSTITIAL_AD_ID)
             loadAd(AdRequest.Builder().build())
             adListener = object : AdListener() {
                 override fun onAdClosed() {
@@ -154,11 +176,11 @@ class MainActivity : AppCompatActivity() {
         }.start()
     }
     
-    private fun hideAllButtons(): Unit {
+    private fun hideAllButtons(){
         niconicoButton.visibility = View.INVISIBLE
         youtubeButton.visibility = View.INVISIBLE
     }
-    private fun showAllButtons(): Unit {
+    private fun showAllButtons(){
         niconicoButton.visibility = View.VISIBLE
         youtubeButton.visibility = View.VISIBLE
     }

@@ -63,6 +63,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:adSize="BANNER"
-        app:adUnitId="@string/BANNER_AD_TEST_ID"
+        app:adUnitId="@string/MAIN_BANNER_AD_ID"
         />
 </android.support.constraint.ConstraintLayout>

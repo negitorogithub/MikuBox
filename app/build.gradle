@@ -40,4 +40,5 @@ dependencies {
     implementation 'com.amazonaws:aws-android-sdk-pinpoint:2.6.18'
     implementation "com.amazonaws:aws-android-sdk-ddb-mapper:2.6.18"
     implementation 'com.google.android.gms:play-services-ads:15.0.1'
+    implementation 'com.github.hotchemi:android-rate:1.0.1'
 }

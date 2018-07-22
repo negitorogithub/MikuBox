@@ -1,6 +1,8 @@
 package unifar.unifar.mikubox
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -17,91 +19,111 @@ import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
-import unifar.unifar.mikubox.lambdaeventgenerator.NicoNicoInterface
-import unifar.unifar.mikubox.lambdaeventgenerator.YoutubeInterface
 import com.google.android.gms.ads.InterstitialAd
 import hotchemi.android.rate.AppRate
-import hotchemi.android.rate.OnClickButtonListener
-
-
+import android.support.design.widget.Snackbar
+import unifar.unifar.mikubox.lambdaeventgenerator.NicoNicoInterface
+import unifar.unifar.mikubox.lambdaeventgenerator.YoutubeInterface
 
 
 class MainActivity : AppCompatActivity() {
 
     private var nicoNicoUri: Uri? = null
     private var youTubeUri: Uri? = null
-    private lateinit var mAdView : AdView
+    private var mAdView : AdView? = null
     private lateinit var mInterstitialAd : InterstitialAd
 
-    private lateinit var niconicoButton: Button
-    private lateinit var youtubeButton: Button
+    private var niconicoButton: Button? = null
+    private var youtubeButton: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
-        monitorAppRate()
 
-        AppRate.showRateDialogIfMeetsConditions(this)
+        niconicoButton = findViewById<Button>(R.id.main_niconicoTextView)
+        youtubeButton = findViewById<Button>(R.id.main_youtubeTextView)
+        val networkThread = HandlerThread("networkThread").apply { start() }
 
+        if (isConnected(this)) {
+            initializeAWS()
+        }else{
+            encourageUserToConnectNet(networkThread)
+        }
 
-        initializeAWS()
         initializeAdMob()
-        val extras = Bundle()
 
-        extras.putString("max_ad_content_rating", "PG")
+        val extras = Bundle()
 
         val adRequest = AdRequest.Builder()
                 .addNetworkExtrasBundle(AdMobAdapter::class.java, extras)
                 .build()
+
         mAdView = findViewById(R.id.main_banner)
-        mAdView.loadAd(adRequest)
+        mAdView?.loadAd(adRequest)
 
+        monitorAppRate()
 
-        niconicoButton = findViewById<Button>(R.id.main_niconicoTextView)
-        youtubeButton = findViewById<Button>(R.id.main_youtubeTextView)
+        AppRate.showRateDialogIfMeetsConditions(this)
 
-        val handlerThread = HandlerThread("networkThread").apply { start() }
+        setOnclickListeners(networkThread)
+    }
 
-        niconicoButton.setOnClickListener {
+    private fun setOnclickListeners(networkThread: HandlerThread) {
+        niconicoButton?.setOnClickListener {
             nicoNicoUri?.let {
-                hideAllButtons()
+                hideAllViews()
                 Handler().postDelayed(
                         {
-                            showAllButtons()
+                            if (isConnected(this)) {
+                            showAllViews()
+                            }
                         }
-                        ,5000)
+                        , 5000)
 
                 val i = Intent(Intent.ACTION_VIEW, nicoNicoUri)
+
                 showInterStitialAd()
-                Toast.makeText(this,resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
-                Handler(handlerThread.looper).postDelayed(
+                Toast.makeText(this, resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
+                Handler(networkThread.looper).postDelayed(
                         {
                             startActivity(i)
-                            nicoNicoUri = Uri.parse(niconicoInterface?.GetRandomNicoNicoLink()?.link)
+                            if (isConnected(this)) {
+                                nicoNicoUri = Uri.parse(niconicoInterface?.GetRandomNicoNicoLink()?.link)
+                            }else{
+                                encourageUserToConnectNet(networkThread)
+                            }
                             Log.d("miku", "niconicoReloaded")
                         }
-                        ,5000)
+                        , 5000)
 
             }
         }
 
-        youtubeButton.setOnClickListener {
+        youtubeButton?.setOnClickListener {
             youTubeUri?.let {
-                hideAllButtons()
+                hideAllViews()
                 Handler().postDelayed(
                         {
-                            showAllButtons()
+                            if (isConnected(this)) {
+                                showAllViews()
+                            }
                         }
-                        ,5000)
+                        , 5000)
+
                 val i = Intent(Intent.ACTION_VIEW, youTubeUri)
                 showInterStitialAd()
-                Toast.makeText(this,resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
-                Handler(handlerThread.looper).postDelayed(
+                Toast.makeText(this, resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
+                Handler(networkThread.looper).postDelayed(
                         {
                             startActivity(i)
-                            youTubeUri = Uri.parse(youtubeInterface?.GetRandomYoutubeLink()?.link)
+                            if (isConnected(this)) {
+                                youTubeUri = Uri.parse(youtubeInterface?.GetRandomYoutubeLink()?.link)
+                            }else{
+                                encourageUserToConnectNet(networkThread)
+                            }
                             Log.d("miku", "youtubeReloaded")
-                            showAllButtons()
+                            showAllViews()
                         }
                         , 5000)
             }
@@ -183,12 +205,41 @@ class MainActivity : AppCompatActivity() {
         }.start()
     }
     
-    private fun hideAllButtons(){
-        niconicoButton.visibility = View.INVISIBLE
-        youtubeButton.visibility = View.INVISIBLE
+    private fun hideAllViews(){
+        Handler(mainLooper).post{
+            niconicoButton?.visibility = View.INVISIBLE
+            youtubeButton?.visibility = View.INVISIBLE
+            mAdView?.visibility = View.INVISIBLE
+        }
     }
-    private fun showAllButtons(){
-        niconicoButton.visibility = View.VISIBLE
-        youtubeButton.visibility = View.VISIBLE
+    private fun showAllViews(){
+        Handler(mainLooper).post{
+            niconicoButton?.visibility = View.VISIBLE
+            youtubeButton?.visibility = View.VISIBLE
+            mAdView?.visibility = View.VISIBLE
+        }
+    }
+
+    private fun isConnected(context: Context): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = cm.activeNetworkInfo
+        return if (networkInfo != null) {
+            cm.activeNetworkInfo.isConnected
+        } else false
+    }
+
+    // オンクリックリスナーを再設定するためにスレッドが必要
+    private fun encourageUserToConnectNet(networkThread: HandlerThread): Unit {
+        if (!isConnected(this)) {
+            hideAllViews()
+            Snackbar.make(findViewById(R.id.main_constraintLayout), "Connection failure. Could you please check your internet connection?", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Retry"
+                    ) { _: View? -> encourageUserToConnectNet(networkThread)}
+                    .show()
+        }else{
+            showAllViews()
+            initializeAWS()
+            setOnclickListeners(networkThread)
+        }
     }
 }

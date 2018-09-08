@@ -72,60 +72,38 @@ class MainActivity : AppCompatActivity() {
     private fun setOnclickListeners(networkThread: HandlerThread) {
         niconicoButton?.setOnClickListener {
             nicoNicoUri?.let {
-                hideAllViews()
-                Handler().postDelayed(
-                        {
-                            if (isConnected(this)) {
-                            showAllViews()
-                            }
-                        }
-                        , 5000)
-
                 val i = Intent(Intent.ACTION_VIEW, nicoNicoUri)
 
-                showInterStitialAd()
+                //showInterStitialAd()
                 Toast.makeText(this, resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
-                Handler(networkThread.looper).postDelayed(
-                        {
-                            startActivity(i)
-                            if (isConnected(this)) {
-                                nicoNicoUri = Uri.parse(niconicoInterface?.GetRandomNicoNicoLink()?.link)
-                            }else{
-                                encourageUserToConnectNet(networkThread)
-                            }
-                            Log.d("miku", "niconicoReloaded")
-                        }
-                        , 5000)
+                Handler(networkThread.looper).post {
+                    startActivity(i)
+                    if (isConnected(this)) {
+                        nicoNicoUri = Uri.parse(niconicoInterface?.GetRandomNicoNicoLink()?.link)
+                    }else{
+                        encourageUserToConnectNet(networkThread)
+                    }
+                    Log.d("miku", "niconicoReloaded")
+                }
 
             }
         }
 
         youtubeButton?.setOnClickListener {
             youTubeUri?.let {
-                hideAllViews()
-                Handler().postDelayed(
-                        {
-                            if (isConnected(this)) {
-                                showAllViews()
-                            }
-                        }
-                        , 5000)
 
                 val i = Intent(Intent.ACTION_VIEW, youTubeUri)
-                showInterStitialAd()
+                //showInterStitialAd()
                 Toast.makeText(this, resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
-                Handler(networkThread.looper).postDelayed(
-                        {
-                            startActivity(i)
-                            if (isConnected(this)) {
-                                youTubeUri = Uri.parse(youtubeInterface?.GetRandomYoutubeLink()?.link)
-                            }else{
-                                encourageUserToConnectNet(networkThread)
-                            }
-                            Log.d("miku", "youtubeReloaded")
-                            showAllViews()
-                        }
-                        , 5000)
+                Handler(networkThread.looper).post {
+                    startActivity(i)
+                    if (isConnected(this)) {
+                        youTubeUri = Uri.parse(youtubeInterface?.GetRandomYoutubeLink()?.link)
+                    }else{
+                        encourageUserToConnectNet(networkThread)
+                    }
+                    Log.d("miku", "youtubeReloaded")
+                }
             }
         }
     }
@@ -231,13 +209,11 @@ class MainActivity : AppCompatActivity() {
     // オンクリックリスナーを再設定するためにスレッドが必要
     private fun encourageUserToConnectNet(networkThread: HandlerThread): Unit {
         if (!isConnected(this)) {
-            hideAllViews()
             Snackbar.make(findViewById(R.id.main_constraintLayout), "Connection failure. Could you please check your internet connection?", Snackbar.LENGTH_INDEFINITE)
                     .setAction("Retry"
                     ) { _: View? -> encourageUserToConnectNet(networkThread)}
                     .show()
         }else{
-            showAllViews()
             initializeAWS()
             setOnclickListeners(networkThread)
         }

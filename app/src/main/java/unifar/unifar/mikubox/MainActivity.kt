@@ -54,7 +54,6 @@ class MainActivity : AppCompatActivity() {
         initializeAdMob()
 
         val extras = Bundle()
-
         val adRequest = AdRequest.Builder()
                 .addNetworkExtrasBundle(AdMobAdapter::class.java, extras)
                 .build()
@@ -63,19 +62,18 @@ class MainActivity : AppCompatActivity() {
         mAdView?.loadAd(adRequest)
 
         monitorAppRate()
-
         AppRate.showRateDialogIfMeetsConditions(this)
 
         setOnclickListeners(networkThread)
     }
 
     private fun setOnclickListeners(networkThread: HandlerThread) {
-        niconicoButton?.setOnClickListener {
+        niconicoButton?.setOnClickListener { _ ->
             nicoNicoUri?.let {
                 val i = Intent(Intent.ACTION_VIEW, nicoNicoUri)
 
                 //showInterStitialAd()
-                Toast.makeText(this, resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
+                //Toast.makeText(this, resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
                 Handler(networkThread.looper).post {
                     startActivity(i)
                     if (isConnected(this)) {
@@ -89,12 +87,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        youtubeButton?.setOnClickListener {
+        youtubeButton?.setOnClickListener { _ ->
             youTubeUri?.let {
 
                 val i = Intent(Intent.ACTION_VIEW, youTubeUri)
                 //showInterStitialAd()
-                Toast.makeText(this, resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
+                //Toast.makeText(this, resources.getString(R.string.wait5seconds), Toast.LENGTH_LONG).show()
                 Handler(networkThread.looper).post {
                     startActivity(i)
                     if (isConnected(this)) {

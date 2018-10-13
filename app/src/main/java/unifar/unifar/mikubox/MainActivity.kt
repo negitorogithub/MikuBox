@@ -16,12 +16,9 @@ import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.lambdainvoker.LambdaInvokerFactory
 import com.amazonaws.regions.Regions
 import com.google.ads.mediation.admob.AdMobAdapter
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.InterstitialAd
 import hotchemi.android.rate.AppRate
 import android.support.design.widget.Snackbar
+import com.google.android.gms.ads.*
 import unifar.unifar.mikubox.lambdaeventgenerator.NicoNicoInterface
 import unifar.unifar.mikubox.lambdaeventgenerator.YoutubeInterface
 
@@ -36,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     private var niconicoButton: Button? = null
     private var youtubeButton: Button? = null
 
+    private lateinit var networkThread: HandlerThread
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -43,28 +42,35 @@ class MainActivity : AppCompatActivity() {
 
         niconicoButton = findViewById<Button>(R.id.main_niconicoTextView)
         youtubeButton = findViewById<Button>(R.id.main_youtubeTextView)
-        val networkThread = HandlerThread("networkThread").apply { start() }
+        mAdView = findViewById(R.id.main_banner)
+        networkThread = HandlerThread("networkThread").apply { start() }
+
+        monitorAppRate()
+
+    }
+
+    override fun onStart() {
+        super.onStart()
 
         if (isConnected(this)) {
             initializeAWS()
         }else{
             encourageUserToConnectNet(networkThread)
         }
+        setOnclickListeners(networkThread)
+
+        initializeApplication()
 
         initializeAdMob()
-
         val extras = Bundle()
         val adRequest = AdRequest.Builder()
                 .addNetworkExtrasBundle(AdMobAdapter::class.java, extras)
                 .build()
-
-        mAdView = findViewById(R.id.main_banner)
         mAdView?.loadAd(adRequest)
-
-        monitorAppRate()
         AppRate.showRateDialogIfMeetsConditions(this)
 
-        setOnclickListeners(networkThread)
+
+
     }
 
     private fun setOnclickListeners(networkThread: HandlerThread) {
@@ -132,14 +138,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showInterStitialAd() {
-        mInterstitialAd.let {
-            if (mInterstitialAd.isLoaded) {
-                mInterstitialAd.show()
-            } else {
-                Log.d("miku", "The interstitial wasn't loaded yet.")
-            }
-        }
+    private fun initializeApplication() {
+        MobileAds.initialize(this, getString(R.string.ADMOB_APP_ID))
 
     }
 

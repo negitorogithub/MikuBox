@@ -3,4 +3,5 @@
     <string name="niconico">nico\nnico</string>
     <string name="youtube">Youtube</string>
     <string name="wait5seconds">5 seconds to go.</string>
+    <string name="now_loading">Now Loading...</string>
 </resources>

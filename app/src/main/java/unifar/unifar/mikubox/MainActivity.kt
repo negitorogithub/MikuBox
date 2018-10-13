@@ -2,6 +2,7 @@ package unifar.unifar.mikubox
 
 import android.content.Context
 import android.content.Intent
+import android.icu.util.ValueIterator
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
@@ -11,7 +12,6 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.lambdainvoker.LambdaInvokerFactory
 import com.amazonaws.regions.Regions
@@ -19,8 +19,14 @@ import com.google.ads.mediation.admob.AdMobAdapter
 import hotchemi.android.rate.AppRate
 import android.support.design.widget.Snackbar
 import com.google.android.gms.ads.*
+import kotlinx.android.synthetic.main.activity_main.*
 import unifar.unifar.mikubox.lambdaeventgenerator.NicoNicoInterface
 import unifar.unifar.mikubox.lambdaeventgenerator.YoutubeInterface
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -32,18 +38,27 @@ class MainActivity : AppCompatActivity() {
 
     private var niconicoButton: Button? = null
     private var youtubeButton: Button? = null
+    private var space: View? = null
+
 
     private lateinit var networkThread: HandlerThread
+
+    companion object {
+        private const val SHOWCASE_ID = "tutorial sequence"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
 
-        niconicoButton = findViewById<Button>(R.id.main_niconicoTextView)
-        youtubeButton = findViewById<Button>(R.id.main_youtubeTextView)
+        niconicoButton = findViewById(R.id.main_niconicoTextView)
+        youtubeButton = findViewById(R.id.main_youtubeTextView)
+        space = findViewById(R.id.space)
+        //textView2 = findViewById(R.id.textView2)
         mAdView = findViewById(R.id.main_banner)
         networkThread = HandlerThread("networkThread").apply { start() }
+        initializeApplication()
 
         monitorAppRate()
 
@@ -52,6 +67,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
+        showTutorial()
         if (isConnected(this)) {
             initializeAWS()
         }else{
@@ -59,7 +75,6 @@ class MainActivity : AppCompatActivity() {
         }
         setOnclickListeners(networkThread)
 
-        initializeApplication()
 
         initializeAdMob()
         val extras = Bundle()
@@ -69,8 +84,28 @@ class MainActivity : AppCompatActivity() {
         mAdView?.loadAd(adRequest)
         AppRate.showRateDialogIfMeetsConditions(this)
 
+    }
 
 
+    private fun showTutorial() {
+
+        val config = ShowcaseConfig()
+        config.delay = 500 // half second between each showcase view
+
+        val sequence = MaterialShowcaseSequence(this, SHOWCASE_ID)
+        sequence.setConfig(config)
+
+        sequence.addSequenceItem(space,
+                "Thank you for installing MikuBox!🎉", "GOT IT")
+        sequence.addSequenceItem(space,
+                "This is an app to play Vocaloid musics randomly.", "GOT IT")
+        sequence.addSequenceItem(youtubeButton,
+                "Push this button to play on youtube.", "GOT IT")
+
+        sequence.addSequenceItem(niconicoButton,
+                "Push this button to play on niconico.", "GOT IT")
+
+        sequence.start()
     }
 
     private fun setOnclickListeners(networkThread: HandlerThread) {
